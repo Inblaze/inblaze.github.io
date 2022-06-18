@@ -1,0 +1,766 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>File System - Chapter 4 | Childish Chen's Blog</title><meta name="keywords" content="学习笔记,操作系统课程"><meta name="author" content="Childish Chen"><meta name="copyright" content="Childish Chen"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="File System - Chapter 4  “计算机科学领域的任何问题都可以通过增加一个间接的中间层来解决。” ​	在文件系统这一章中这句话将会被反复印证.  Files A file is an abstraction mechanism. It provides a way to store information on the disk and read it back later.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="File System - Chapter 4">
+<meta property="og:url" content="https://inblaze.github.io/2022/06/18/OS/File%20System%20-%20Chapter%204/index.html">
+<meta property="og:site_name" content="Childish Chen&#39;s Blog">
+<meta property="og:description" content="File System - Chapter 4  “计算机科学领域的任何问题都可以通过增加一个间接的中间层来解决。” ​	在文件系统这一章中这句话将会被反复印证.  Files A file is an abstraction mechanism. It provides a way to store information on the disk and read it back later.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+<meta property="article:published_time" content="2022-06-18T07:22:00.000Z">
+<meta property="article:modified_time" content="2022-06-18T07:55:24.853Z">
+<meta property="article:author" content="Childish Chen">
+<meta property="article:tag" content="学习笔记">
+<meta property="article:tag" content="操作系统课程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://inblaze.github.io/2022/06/18/OS/File%20System%20-%20Chapter%204/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'File System - Chapter 4',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-06-18 15:55:24'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://s4.ax1x.com/2022/03/03/bYXlxH.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">19</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">6</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">4</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archive</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Childish Chen's Blog</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archive</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">File System - Chapter 4</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2022-06-18T07:22:00.000Z" title="Created 2022-06-18 15:22:00">2022-06-18</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2022-06-18T07:55:24.853Z" title="Updated 2022-06-18 15:55:24">2022-06-18</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AF%BE%E7%A8%8B%EF%BC%9A%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">课程：操作系统</a></span></div><div class="meta-secondline"></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1>File System - Chapter 4</h1>
+<blockquote>
+<p>“计算机科学领域的任何问题都可以通过增加一个间接的中间层来解决。”</p>
+<p>​	在文件系统这一章中这句话将会被反复印证.</p>
+</blockquote>
+<h2 id="Files">Files</h2>
+<p>A file is an abstraction mechanism. It provides a way to store information on the disk and read it back later. This must be done in such a way as to shield the user from the details of how and where the information is stored, and how the disks actually work.</p>
+<h3 id="File-Naming">File Naming</h3>
+<p>没啥好说的</p>
+<h3 id="File-Structure">File Structure</h3>
+<p><img src="https://s1.ax1x.com/2022/06/17/XbL1hj.png" alt="3 File Structure"></p>
+<h3 id="File-Types">File Types</h3>
+<h4 id="Special-Files">Special Files</h4>
+<h5 id="Character-Special-Files">Character Special Files</h5>
+<p>Character special files are related to input/output and used to model serial I/O devices, such as terminals, printers, and networks.</p>
+<p>特点：内容只能顺序访问</p>
+<h5 id="Block-Special-Files">Block Special Files</h5>
+<p>Block special files are used to model disks.</p>
+<p>特点：内容可以随机访问</p>
+<h4 id="Directories">Directories</h4>
+<p>Directories are system files for maintaining the structure of the file system.</p>
+<h4 id="Regular-Files">Regular Files</h4>
+<h5 id="ASCII-Files">ASCII Files</h5>
+<p>ASCII files consist of lines of text.</p>
+<p><strong>Advantages</strong></p>
+<ul class="lvl-0">
+<li class="lvl-2">
+<p>The great advantage of ASCII files is that they can be displayed and printed as is, and they can be edited with any text editor.</p>
+</li>
+<li class="lvl-2">
+<p>If large numbers of programs use ASCII files for input and output, it is easy to connect the output of one program to the input of another, as in shell pipelines.</p>
+</li>
+</ul>
+<h5 id="Binary-Files">Binary Files</h5>
+<p>二进制文件内容不可显示、打印。</p>
+<p>Usually, they have some internal structure known to programs that use them.</p>
+<p>The operating system will execute a file only if it has the proper format. It has five sections: header, text, data, relocation bits, and symbol table.</p>
+<p><img src="https://s1.ax1x.com/2022/06/17/XbxTn1.png" alt="binary file structure"></p>
+<h6 id="Header">Header</h6>
+<p>The header starts with a so-called <strong>magic number,</strong> identifying the file as an executable file (to prevent the accidental execution of a file not in this format).</p>
+<p>Then come the sizes of the various pieces of the file, the address at which execution starts, and some flag bits. Following the header are the text and data of the program itself. These are loaded into memory and relocated using the relocation bits. The symbol table is used for debugging.</p>
+<h3 id="File-Access">File Access</h3>
+<h4 id="Sequential-Access">Sequential Access</h4>
+<p>顺序访问，没啥好说的</p>
+<h4 id="Random-Access">Random Access</h4>
+<p>There’s 2 methods for implementation of random access.</p>
+<ul class="lvl-0">
+<li class="lvl-2">
+<p>Every read operation gives the position in the file to start reading at.</p>
+</li>
+<li class="lvl-2">
+<p>Give a special operation, <strong>seek</strong>, which is provided to set the current position.</p>
+</li>
+</ul>
+<p>The latter method is used in UNIX and Windows.</p>
+<h3 id="File-Attributes">File Attributes</h3>
+<table>
+<thead>
+<tr>
+<th>Attributes</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Protection</td>
+<td>Who can access the file and in what way</td>
+</tr>
+<tr>
+<td>Password</td>
+<td>Password needed to access the file</td>
+</tr>
+<tr>
+<td>Creator</td>
+<td>ID of the person who created the file</td>
+</tr>
+<tr>
+<td>Owner</td>
+<td>Current owner</td>
+</tr>
+<tr>
+<td>Read-only flag</td>
+<td>0 for read/write; 1 for read only</td>
+</tr>
+<tr>
+<td>Hidden flag</td>
+<td>0 for normal; 1 for do not display in listings</td>
+</tr>
+<tr>
+<td>System flag</td>
+<td>0 for normal files; 1 for system file</td>
+</tr>
+<tr>
+<td>Archive flag</td>
+<td>0 for has been backed up; 1 for needs to be backed up</td>
+</tr>
+<tr>
+<td>ASCII/binary flag</td>
+<td>0 for ASCII file; 1 for binary file</td>
+</tr>
+<tr>
+<td>Random access flag</td>
+<td>0 for sequential access only; 1 for random access</td>
+</tr>
+<tr>
+<td>Temporary flag</td>
+<td>0 for normal; 1 for delete file on process exit</td>
+</tr>
+<tr>
+<td>Lock flags</td>
+<td>0 for unlocked; nonzero for locked</td>
+</tr>
+<tr>
+<td>Record length</td>
+<td>Number of bytes in a record</td>
+</tr>
+<tr>
+<td>Key position</td>
+<td>Offset of the key within each record</td>
+</tr>
+<tr>
+<td>Key length</td>
+<td>Number of bytes in the key field</td>
+</tr>
+<tr>
+<td>Creation time</td>
+<td>Date and time the file was created</td>
+</tr>
+<tr>
+<td>Time of last access</td>
+<td>Date and time the file was last accessed</td>
+</tr>
+<tr>
+<td>Time of last change</td>
+<td>Date and time the file was last changed</td>
+</tr>
+<tr>
+<td>Current size</td>
+<td>Number of bytes in the file</td>
+</tr>
+<tr>
+<td>Maximum size</td>
+<td>Number of bytes the file may grow to</td>
+</tr>
+</tbody>
+</table>
+<p>These above is some possible file attributes. They’re different in different system.</p>
+<h3 id="File-Operations">File Operations</h3>
+<ol>
+<li class="lvl-3">
+<p><strong>Create</strong>. The file is created with no data. The purpose of the call is to announce that the file is coming and to set some of the attributes.</p>
+</li>
+<li class="lvl-3">
+<p><strong>Delete</strong>. When the file is no longer needed, it has to be deleted to free up disk space. There is always a system call for this purpose.</p>
+</li>
+<li class="lvl-3">
+<p><strong>Open</strong>. Before using a file, a process must open it. The purpose of the open call is to allow the system to fetch the attributes and list of disk addresses into main memory for rapid access on later calls.</p>
+</li>
+<li class="lvl-3">
+<p><strong>Close</strong>. When all the accesses are finished, the attributes and disk addresses are no longer needed, so the file should be closed to free up internal table space. Many systems encourage this by imposing a maximum number of open files on processes. A disk is written in blocks, and closing a file forces writing of the file’s last block, even though that block may not be entirely full yet.</p>
+</li>
+<li class="lvl-3">
+<p><strong>Read</strong>. Data are read from file. Usually, the bytes come from the current position. The caller must specify how many data are needed and must also provide a buffer to put them in.</p>
+</li>
+<li class="lvl-3">
+<p><strong>Write</strong>. Data are written to the file again, usually at the current position. If the current position is the end of the file, the file’s size increases. If the current position is in the middle of the file, existing data are overwritten and lost forever.</p>
+</li>
+<li class="lvl-3">
+<p><strong>Append</strong>. This call is a restricted form of write. It can add data only to the end of the file. Systems that provide a minimal set of system calls rarely have append , but many systems provide multiple ways of doing the same thing, and these systems sometimes have append.</p>
+</li>
+<li class="lvl-3">
+<p><strong>Seek</strong>. For random-access files, a method is needed to specify from where to take the data. One common approach is a system call, seek, that repositions the file pointer to a specific place in the file. After this call has completed, data can be read from, or written to, that position.</p>
+</li>
+<li class="lvl-3">
+<p><strong>Get attributes</strong>. Processes often need to read file attributes to do their work. For example, the UNIX make program is commonly used to manage software development projects consisting of many source files. When make is called, it examines the modification times of all the source and object files and arranges for the minimum number of compilations required to bring everything up to date. To do its job, it must look at the attributes, namely, the modification times.</p>
+</li>
+<li class="lvl-4">
+<p><strong>Set attributes</strong>. Some of the attributes are user settable and can be changed after the file has been created. This system call makes that possible. The protection-mode information is an obvious example. Most of the flags also fall in this category.</p>
+</li>
+<li class="lvl-4">
+<p><strong>Rename</strong>. It frequently happens that a user needs to change the name of an existing file. This system call makes that possible. It is not always strictly necessary, because the file can usually be copied to a new file with the new name, and the old file then deleted.</p>
+</li>
+</ol>
+<h2 id="Dictionaries">Dictionaries</h2>
+<p>To keep track of files, file systems normally have <strong>directories</strong> or <strong>folders</strong>, <strong>which are themselves files</strong>.</p>
+<h3 id="Single-Level-Directory-System">Single-Level Directory System</h3>
+<p>The simplest form of directory system is having one directory containing all the files. Sometimes it is called the <strong>root directory</strong>, but since it is the only one, the name does not matter much.</p>
+<p>The advantages of this scheme are its simplicity and the ability to locate files quickly—there is only one place to look, after all. It is sometimes still used on simple embedded devices such as digital cameras and some portable music players.</p>
+<h3 id="Hierarchical-Directory-Systems">Hierarchical Directory Systems</h3>
+<p><img src="https://s1.ax1x.com/2022/06/17/XquGTS.png" alt="hierarchical directory system"></p>
+<h3 id="Path-Names">Path Names</h3>
+<ul class="lvl-0">
+<li class="lvl-2">
+<p>Absolute path name</p>
+</li>
+<li class="lvl-2">
+<p>Relative path name</p>
+</li>
+</ul>
+<h3 id="Directory-Operations">Directory Operations</h3>
+<ol>
+<li class="lvl-3">
+<p><strong>Create</strong>. A directory is created. It is empty except for dot and dotdot, which are put there automatically by the system (or in a few cases, by the mkdir program).</p>
+</li>
+<li class="lvl-3">
+<p><strong>Delete</strong>. A directory is deleted. Only an empty directory can be deleted. A directory containing only dot and dotdot is considered empty as these cannot be deleted.</p>
+</li>
+<li class="lvl-3">
+<p><strong>Opendir</strong>. Directories can be read. For example, to list all the files in a directory, a listing program opens the directory to read out the names of all the files it contains. Before a directory can be read, it must be opened, analogous to opening and reading a file.</p>
+</li>
+<li class="lvl-3">
+<p><strong>Closedir</strong>. When a directory has been read, it should be closed to free up internal table space.</p>
+</li>
+<li class="lvl-3">
+<p><strong>Readdir</strong>. This call returns the next entry in an open directory. Formerly, it was possible to read directories using the usual read system call, but that approach has the disadvantage of forcing the programmer to know and deal with the internal structure of directories. In contrast, readdir always returns one entry in a standard format, no matter which of the possible directory structures is being used.</p>
+</li>
+<li class="lvl-3">
+<p><strong>Rename</strong>. In many respects, directories are just like files and can be renamed the same way files can be.</p>
+</li>
+<li class="lvl-3">
+<p><strong>Link</strong>. Linking is a technique that allows a file to appear in more than one directory. This system call specifies an existing file and a path name, and creates a link from the existing file to the name specified by the path. In this way, the same file may appear in multiple directories. A link of this kind, which increments the counter in the file’s i-node (to keep track of the number of directory entries containing the file), is sometimes called a hard link.</p>
+</li>
+<li class="lvl-3">
+<p><strong>Unlink</strong>. A directory entry is removed. If the file being unlinked is only present in one directory (the normal case), it is removed from the file system. If it is present in multiple directories, only the path name specified is removed. The others remain. In UNIX, the system call for deleting files (discussed earlier) is, in fact, unlink .</p>
+</li>
+</ol>
+<h2 id="File-System-Implementation">File-System Implementation</h2>
+<h3 id="File-System-Layout">File-System Layout</h3>
+<ul class="lvl-0">
+<li class="lvl-2">
+<p>Sector 0 of the disk is called the <strong>MBR (Master Boot Record)</strong> and is used to boot the computer. The end of the MBR contains the partition table. This table gives the starting and ending addresses of each partition.</p>
+</li>
+<li class="lvl-2">
+<p>One of the partitions in the table is marked as active. When the computer is booted, the BIOS reads in and executes the MBR. The first thing the MBR program does is locate the active partition, read in its first block, which is called the <strong>boot block</strong>, and execute it. The program in the boot block loads the operating system contained in that partition.</p>
+</li>
+<li class="lvl-2">
+<p><strong>Super block</strong> contains all the key parameters about the file system and is read into memory when the computer is booted or the file system is first touched. Typical information in the super block includes a magic number to identify the file-system type, the number of blocks in the file system, and other key administrative information.</p>
+</li>
+<li class="lvl-2">
+<p>Next might come information about free blocks in the file system, for example, in the form of a bitmap or a list of pointers.</p>
+</li>
+<li class="lvl-2">
+<p>This might be followed by the i-nodes, an array of data structures, one per file, telling all about the file.</p>
+</li>
+<li class="lvl-2">
+<p>After that might come the root directory, which contains the top of the file-system tree.</p>
+</li>
+<li class="lvl-2">
+<p>Finally, the remainder of the disk contains all the other directories and files.</p>
+</li>
+</ul>
+<p><img src="https://s1.ax1x.com/2022/06/17/Xq6nQs.png" alt="file system layout"></p>
+<h3 id="Implementing-Files">Implementing Files</h3>
+<p>Probably the most important issue in implementing file storage is <strong>keeping track of which disk blocks go with which file</strong>.</p>
+<h4 id="Contiguous-Allocation">Contiguous Allocation</h4>
+<p>连续分配，算法流程没啥好说的</p>
+<p><strong>Advantages</strong></p>
+<ul class="lvl-0">
+<li class="lvl-2">
+<p>It is simple to implement because keeping track of where a file’s blocks are is reduced to remembering two numbers: the disk address of the first block and the number of blocks in the file.</p>
+</li>
+<li class="lvl-2">
+<p>the read performance is excellent because the entire file can be read from the disk in a single operation. Only one seek is needed (to the first block). After that, no more seeks or rotational delays are needed.</p>
+</li>
+</ul>
+<p><strong>Disadvantages</strong></p>
+<ul class="lvl-0">
+<li class="lvl-2">
+<p>There’ll be many disk fragmentation.</p>
+</li>
+</ul>
+<h4 id="Linked-List-Allocation">Linked-List Allocation</h4>
+<p>The second method for storing files is to keep each one as a linked list of disk blocks.</p>
+<p>The first word of each block is used as a pointer to the next one. The rest of the block is for data.</p>
+<p><img src="https://s1.ax1x.com/2022/06/17/Xq5QmQ.png" alt="linked-list allocation"></p>
+<p><strong>Advantages</strong></p>
+<ul class="lvl-0">
+<li class="lvl-2">
+<p>No fragmentation, no waste.</p>
+</li>
+</ul>
+<p><strong>Disadvantages</strong></p>
+<ul class="lvl-0">
+<li class="lvl-2">
+<p>Slow random access.</p>
+</li>
+<li class="lvl-2">
+<p>The amount of data storage in a block is no longer a power of two because the pointer takes up a few bytes. While not fatal, having a peculiar size is less efficient because many programs read and write in blocks whose size is a power of two.</p>
+</li>
+</ul>
+<h4 id="Linked-List-Allocation-Using-a-Table-in-Memory">Linked-List Allocation Using a Table in Memory</h4>
+<p>Both disadvantages of the linked-list allocation can be eliminated by taking the pointer word from each disk block and putting it in a table in memory.</p>
+<p>Such a table in main memory is called <strong>FAT(File Allocation Table)</strong>.</p>
+<p>该方式将磁盘块做成一张大表，放在内存里，每个文件仅需记录起始块号的物理块号，每个表里放的是下一块的地址，最后用特殊数字(-1)做终止。每次需要寻找block i的时候，由于逻辑块号已经隐含在查找顺序中，所以只需要在内存中从起始块号依次找i-1次即可找到它的物理块号。</p>
+<p><img src="https://s1.ax1x.com/2022/06/17/XqouZQ.png" alt="Linked-List Allocation Using a Table in Memory"></p>
+<p>假设我们需要找到File A的block 2对应的物理块：</p>
+<ol>
+<li class="lvl-3">
+<p>从directory entry中找到File A的起始块(block 0)在物理块4中</p>
+</li>
+<li class="lvl-3">
+<p>在主存中的FAT中找到表项4的内容是7（说明block 1在物理块7中），于是继续找FAT中的表项7</p>
+</li>
+<li class="lvl-3">
+<p>表项7的内容是2，说明block 2在物理块2中</p>
+</li>
+</ol>
+<p>这种方式解决了Linked-list allocation在随机访问磁盘块的时候需要多次访问外存导致耗时过多的问题，由于FAT存储在主存里，所以找到需要访问的磁盘块对应的物理块号只需要在主存中访问FAT即可，大大减少了耗时。</p>
+<p>但由于该方式下FAT需要存储所有磁盘块的信息，占用的内存与磁盘容量呈正比，磁盘容量较大时FAT占用的主存空间过大。</p>
+<h4 id="I-nodes">I-nodes</h4>
+<p>这个方式是给每个文件一个i-node，里面记录了文件的属性，以及每个逻辑磁盘块的物理块地址，其中逻辑块号隐含在i-node的表项顺序中，如果i-node不够记录文件了，那么让i-node的最后一个或多个记录磁盘地址的项不存储地址，而是指向另一个包含更多磁盘块地址的i-node。</p>
+<p><img src="https://s1.ax1x.com/2022/06/17/XqbH9s.png" alt="inode"></p>
+<p>该方式比FAT占用的主存要小得多，因为每次只需要将对应文件的i-node存入主存而不需要把所有磁盘块的信息常驻主存。</p>
+<h3 id="Implementing-Directories">Implementing Directories</h3>
+<p>有两种方法实现目录，一种是固定大小的目录项，一种是只包含文件名和i节点指针的目录项，其余属性由i节点记录。</p>
+<p>对于固定大小的实现，除了文件名就是一个文件属性结构体，以及用于说明磁盘块位置的一个或多个磁盘地址。</p>
+<p>对于长文件名，有两种实现。</p>
+<p>第一种方式是将文件名存在目录中该文件对应的目录项的末尾。该方式有两个缺点：</p>
+<ol>
+<li class="lvl-3">
+<p>当这个文件被删除后该目录会空出一块，然而当下一个新文件加入目录时若新文件的文件名长于原来被删除的文件则新文件无法放入空出的这一块；若新文件的文件名短于原来被删除的文件则会造成一定字节的浪费</p>
+</li>
+<li class="lvl-3">
+<p>为了使每个目录项从字的边界开始，每个文件名必须被填充成整数个字，造成了一定的空间浪费</p>
+</li>
+</ol>
+<p><img src="https://s1.ax1x.com/2022/06/17/XqxDM9.png" alt="filename way 1"></p>
+<p>第二种方式是将一个目录文件中的所有目录项的文件名放在该目录文件的末尾，并需要用堆维护这些文件名。</p>
+<p><img src="https://s1.ax1x.com/2022/06/17/Xqx6Vx.png" alt="filename way 2"></p>
+<p>查找文件名是一个费时的操作，可以使用Hash表，把Hash值相同的连接在一起，Hash表的键是Hash值，表的值是目录项。</p>
+<h3 id="Shared-Files">Shared Files</h3>
+<p>对于共享文件，有两种常用的实现(同时也解决了文件在进程间的同步问题)。<strong>利用i-node(又称硬链接)<strong>和</strong>symbolic link(又称软链接)</strong>。</p>
+<ul class="lvl-0">
+<li class="lvl-2">
+<p>利用i-node：这种方式的i-node中存储了文件信息，假设用户A要在其用户目录下共享用户B的用户目录下的一个文件F，只需要将用户A的用户目录中创建一个i-node域指向F的i-node的目录项，然后给F的i-node的节点计数器（记录有多少个节点link到此文件）加1即可。</p>
+<ul class="lvl-2">
+<li class="lvl-4">这种方式的问题在于节点计数器非0的时候不能删除该文件，只有没有其他任何用户在共享该文件时才能删除该文件</li>
+</ul>
+</li>
+<li class="lvl-2">
+<p>symbolic link：这种方式只在A用户文件夹下建立一个Link文件，该文件只含有要共享的文件F的文件路径信息，没有F的i-node信息，就像快捷方式一样。</p>
+<ul class="lvl-2">
+<li class="lvl-4">symbolic link的一个问题是找到Link文件后还需要一步一步地扫描路径找到共享的F文件，需要额外多次的磁盘访问</li>
+<li class="lvl-4">另一个问题是，虽然F文件可以直接被删除了，但删除之后Link文件也失效了</li>
+</ul>
+</li>
+</ul>
+<h3 id="Log-Structured-File-System">Log-Structured File System</h3>
+<p>基本思想是 为了解决琐碎频繁的写操作，将这些写操作积聚起来大量连续写入</p>
+<p>每次把准备写入的数据放到缓冲区中，然后每隔一段时间就写入硬盘。写入的方式是将他们作为一个段追加在日志的末尾（LFS把整个硬盘当成了一个日志）</p>
+<p>作为一个单独的段写入到日志末尾，那么这个段可能包含数据、i-node等等信息。所以在LFS系统，i-node遍布于磁盘而不是像普通文件系统那样集中于某处。所以就要求能快速查找i-node，所以可以建立一张i-node的索引表，并将索引表存到内存里去。</p>
+<p>如果写入日志写到了磁盘末尾，那么磁盘因已占满不能存入任何段，于是我们想到使用一个<strong>Cleaner</strong>线程周期性地扫描日志进行磁盘压缩，具体过程是：</p>
+<ol>
+<li class="lvl-3">
+<p>Cleaner从日志第一段开始扫描到最后</p>
+</li>
+<li class="lvl-3">
+<p>如果扫描到该段的i-node失效/文件块已不再使用，则这一段会被丢弃，空间被释放</p>
+</li>
+<li class="lvl-3">
+<p>如果扫描到该段的i-node有效/文件块仍在使用，则这一段的信息进入内存等待写回到下一个段中，这一段原本占用的空间被释放</p>
+</li>
+</ol>
+<h3 id="Journaling-File-System">Journaling File System</h3>
+<p>日志文件系统主要用来处理崩溃发生后的情况，对于一个操作，日志系统会先把操作放到日志里，然后执行，如果操作全部成功完成，再删除日志记录，这样可以防止在死机崩溃时丢失操作。</p>
+<p>但是，日志系统要求操作必须是**幂等(idempotent)**的，就是可以被执行任意次且不会产生影响。</p>
+<p>当然，还可以通过**原子事务(atomic transaction)**操作来确保操作的完成。</p>
+<h4 id="LFS与Journaling-File-System的区别">LFS与Journaling File System的区别</h4>
+<p>LFS是将整个磁盘当做一个日志，而JFS则是将磁盘中的某一部分当做日志区，其他部分仍然是传统的文件系统。</p>
+<h3 id="Virtual-File-System">Virtual File System</h3>
+<p>Most UNIX systems have used the concept of a VFS (virtual file system) to try to integrate multiple file systems into an orderly structure.</p>
+<p>VFS的思想类似于Cpp中的虚函数，VFS为上层用户线程提供统一的接口，要求下层注册在VFS中的各种文件系统实现这些接口</p>
+<h2 id="File-System-Management-and-Optimization">File-System Management and Optimization</h2>
+<h3 id="Disk-Space-Management">Disk-Space Management</h3>
+<h4 id="Block-Size">Block Size</h4>
+<p><strong>块大小</strong>是一个很重要的指标，一般情况下是1KB。</p>
+<ul class="lvl-0">
+<li class="lvl-2">
+<p>块大了，会浪费空间，产生很多块内碎片</p>
+</li>
+<li class="lvl-2">
+<p>块小了，同一个文件会产生更多次寻道和旋转延迟才能读出，浪费时间。所以合理的设计块大小很重要。</p>
+</li>
+</ul>
+<h4 id="Keeping-Track-of-Free-Blocks">Keeping Track of Free Blocks</h4>
+<h5 id="Using-Linked-List-of-Free-Blocks">Using Linked List of Free Blocks</h5>
+<p>用一个空闲块记录其他空闲块的块号，并且用这个空闲块的最后一个位置不用来存储空闲块块号，而是用来存储一个指向下一个记录块的指针。</p>
+<p><img src="https://s1.ax1x.com/2022/06/18/XL5OLF.md.png" alt="using linked list of free blocks"></p>
+<p>改进：如果磁盘中有许多大段连续的空闲块，可以将链表改为记录每一段的首块块号和空闲块连续段的长度。</p>
+<h5 id="Using-Bitmap">Using Bitmap</h5>
+<p>Bitmap中每一位对应一个磁盘块，该位为0表示该磁盘块空闲，该位为1表示该磁盘块正被使用。</p>
+<p>需要释放某个正在使用的磁盘块就将Bitmap上对应的位与0进行与运算，需要使用某个空闲的磁盘块就将Bitmap上对应的位与1进行或运算。</p>
+<p>Bitmap不仅占用的空间小，查询速度也快。</p>
+<p>只有在整个磁盘的占用接近满了的时候Linked List才会比Bitmap占用的空间小。</p>
+<h4 id="Disk-Quotas">Disk Quotas</h4>
+<p>To prevent people from hogging too much disk space, multiuser operating systems often provide a mechanism for enforcing disk quotas.</p>
+<p>The idea is that the system administrator assigns each user a maximum allotment of files and blocks, and the operating system makes sure that the users do not exceed their quotas.</p>
+<p><img src="https://s1.ax1x.com/2022/06/18/XLTBa4.md.png" alt="disk quotas"></p>
+<p>This method has the property that users may go above their soft limits during a login session, provided they remove the excess before logging out. The hard limits may never be exceeded.</p>
+<h4 id="Disk-Backup">Disk Backup</h4>
+<h5 id="Incremental-Dump">Incremental Dump</h5>
+<p>To dump only those files that have changed since they were last dumped.</p>
+<h5 id="Physical-Dump">Physical Dump</h5>
+<p>A physical dump starts at block 0 of the disk, writes all the disk blocks onto the output disk in order, and stops when it has copied the last one.</p>
+<h5 id="Logical-Dump">Logical Dump</h5>
+<p>A logical dump starts at one or more specified directories and recursively(递归地) dumps all files and directories found there that have changed since some given base date.</p>
+<h4 id="File-System-Consistency">File-System Consistency</h4>
+<p>Two kinds of consistency checks can be made: blocks and files. To check for block consistency, the program builds two tables, each one containing a counter for each block, initially set to 0. The counters in the first table keep track of how many times each block is present in a file; the counters in the second table record how often each block is present in the free list (or the bitmap of free blocks).</p>
+<p>The check program then reads all the i-nodes using a raw device, which ignores the file structure and just returns all the disk blocks starting at 0. Starting from an i-node, it is possible to build a list of all the block numbers used in the corresponding file. As each block number is read, its counter in the first table is incremented.<br>
+The check program then examines the free list or bitmap to find all the blocks that are not in use. Each occurrence of a block in the free list results in its counter in the second table being incremented.</p>
+<p><img src="https://s1.ax1x.com/2022/06/18/XLOLyn.md.png" alt="XLOLyn.md.png"></p>
+<h4 id="File-System-Performance">File System Performance</h4>
+<h5 id="Caching">Caching</h5>
+<p>计组里学的高速缓存Cache，不多说</p>
+<p>替换的时候根据LRU算法替换</p>
+<h5 id="Block-Read-Ahead">Block Read Ahead</h5>
+<p>To try to get blocks into the cache before they are needed to increase the hit rate.</p>
+<p>Usable only in sequential access.</p>
+<h5 id="Reducing-Disk-Arm-Motion">Reducing Disk-Arm Motion</h5>
+<p>To reduce the amount of disk-arm motion by putting blocks that are likely to be accessed in sequence close to each other, preferably in the same cylinder.</p>
+<p><img src="https://s1.ax1x.com/2022/06/18/XLvmxH.png" alt="reduce disk-arm motion"></p>
+<h5 id="Defragmenting-Disks">Defragmenting Disks</h5>
+<p>整理磁盘减少hole，但在SSD上不要用，可能会减少SSD寿命。</p>
+<h2 id="Example-File-Systems">Example File Systems</h2>
+<h3 id="CD-ROM-File-System">CD-ROM File System</h3>
+<p>This is non-key.</p>
+<h4 id="ISO-9660">ISO 9660</h4>
+<p><img src="https://s1.ax1x.com/2022/06/18/XOSeRU.png" alt="ISO 9660 entry"></p>
+<h3 id="MS-DOS-File-System">MS-DOS File System</h3>
+<p>This is non-key.</p>
+<p><img src="https://s1.ax1x.com/2022/06/18/XOSGi6.png" alt="MS-DOS directory entry"></p>
+<h3 id="Unix-V7-File-System">Unix V7 File System</h3>
+<h4 id="Directory-Entry">Directory Entry</h4>
+<p><img src="https://s1.ax1x.com/2022/06/18/XOSBdI.png" alt="Unix V7 directory entry"></p>
+<p>We can infer that the maximum number of files is <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: 0" xmlns="http://www.w3.org/2000/svg" width="2.919ex" height="1.887ex" role="img" focusable="false" viewBox="0 -833.9 1290.1 833.9"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="mn"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g><g data-mml-node="TeXAtom" transform="translate(533,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mn"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path><path data-c="36" d="M42 313Q42 476 123 571T303 666Q372 666 402 630T432 550Q432 525 418 510T379 495Q356 495 341 509T326 548Q326 592 373 601Q351 623 311 626Q240 626 194 566Q147 500 147 364L148 360Q153 366 156 373Q197 433 263 433H267Q313 433 348 414Q372 400 396 374T435 317Q456 268 456 210V192Q456 169 451 149Q440 90 387 34T253 -22Q225 -22 199 -14T143 16T92 75T56 172T42 313ZM257 397Q227 397 205 380T171 335T154 278T148 216Q148 133 160 97T198 39Q222 21 251 21Q302 21 329 59Q342 77 347 104T352 209Q352 289 347 316T329 361Q302 397 257 397Z" transform="translate(500,0)"></path></g></g></g></g></g></svg></mjx-container> according to the i-node occupying 2 bytes.</p>
+<h4 id="I-node">I-node</h4>
+<p><img src="https://s1.ax1x.com/2022/06/18/XOpG0s.png" alt="Unix i-node"></p>
+<h4 id="Steps-in-Looking-Up-a-File">Steps in Looking Up a File</h4>
+<p><img src="https://s1.ax1x.com/2022/06/18/XO9SBj.png" alt="steps in looking up a file"></p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a><a class="post-meta__tags" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AF%BE%E7%A8%8B/">操作系统课程</a></div><div class="post_share"><div class="social-share" data-image="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2022/06/10/ComputerArchitecture/%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%20-%20Chapter%207/"><img class="next-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">存储系统 - Chapter 7</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><div><a href="/2022/05/13/OS/Deadlocks%20-%20Chapter%206/" title="Deadlocks - Chapter 6"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-05-13</div><div class="title">Deadlocks - Chapter 6</div></div></a></div><div><a href="/2022/05/29/OS/Memory%20Management%20-%20Chapter%203/" title="Memory Management - Chapter 3"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-05-29</div><div class="title">Memory Management - Chapter 3</div></div></a></div><div><a href="/2022/04/16/OS/Process%20and%20Thread%20-%20Chapter%202/" title="Process and Thread - Chapter 2"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-16</div><div class="title">Process and Thread - Chapter 2</div></div></a></div><div><a href="/2022/03/21/ComputerArchitecture/3.3%20%E6%B5%AE%E7%82%B9%E8%BF%90%E7%AE%97/" title="浮点数运算"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-03-21</div><div class="title">浮点数运算</div></div></a></div><div><a href="/2022/03/21/ComputerArchitecture/%E5%AE%9A%E7%82%B9%E6%95%B0%E7%9A%84%E4%B9%98%E9%99%A4%E6%B3%95%E8%BF%90%E7%AE%97/" title="整数、定点数的乘除法运算"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-03-21</div><div class="title">整数、定点数的乘除法运算</div></div></a></div><div><a href="/2022/04/30/ComputerArchitecture/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F%E4%B8%8E%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80%20-%20Chapter%204/" title="指令系统与汇编语言"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-30</div><div class="title">指令系统与汇编语言</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div></div><div class="comment-wrap"><div><div id="lv-container" data-id="city" data-uid="MTAyMC81NTYzNi8zMjEwMw=="></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://s4.ax1x.com/2022/03/03/bYXlxH.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Childish Chen</div><div class="author-info__description">Every great story begins with a vision.</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">19</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">6</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">4</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/inblaze"><i class="fab fa-github"></i><span>My Github Account</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text">File System - Chapter 4</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Files"><span class="toc-number">1.1.</span> <span class="toc-text">Files</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#File-Naming"><span class="toc-number">1.1.1.</span> <span class="toc-text">File Naming</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#File-Structure"><span class="toc-number">1.1.2.</span> <span class="toc-text">File Structure</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#File-Types"><span class="toc-number">1.1.3.</span> <span class="toc-text">File Types</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Special-Files"><span class="toc-number">1.1.3.1.</span> <span class="toc-text">Special Files</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Character-Special-Files"><span class="toc-number">1.1.3.1.1.</span> <span class="toc-text">Character Special Files</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Block-Special-Files"><span class="toc-number">1.1.3.1.2.</span> <span class="toc-text">Block Special Files</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Directories"><span class="toc-number">1.1.3.2.</span> <span class="toc-text">Directories</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Regular-Files"><span class="toc-number">1.1.3.3.</span> <span class="toc-text">Regular Files</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#ASCII-Files"><span class="toc-number">1.1.3.3.1.</span> <span class="toc-text">ASCII Files</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Binary-Files"><span class="toc-number">1.1.3.3.2.</span> <span class="toc-text">Binary Files</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#Header"><span class="toc-number">1.1.3.3.2.1.</span> <span class="toc-text">Header</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#File-Access"><span class="toc-number">1.1.4.</span> <span class="toc-text">File Access</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Sequential-Access"><span class="toc-number">1.1.4.1.</span> <span class="toc-text">Sequential Access</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Random-Access"><span class="toc-number">1.1.4.2.</span> <span class="toc-text">Random Access</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#File-Attributes"><span class="toc-number">1.1.5.</span> <span class="toc-text">File Attributes</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#File-Operations"><span class="toc-number">1.1.6.</span> <span class="toc-text">File Operations</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dictionaries"><span class="toc-number">1.2.</span> <span class="toc-text">Dictionaries</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Single-Level-Directory-System"><span class="toc-number">1.2.1.</span> <span class="toc-text">Single-Level Directory System</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Hierarchical-Directory-Systems"><span class="toc-number">1.2.2.</span> <span class="toc-text">Hierarchical Directory Systems</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Path-Names"><span class="toc-number">1.2.3.</span> <span class="toc-text">Path Names</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Directory-Operations"><span class="toc-number">1.2.4.</span> <span class="toc-text">Directory Operations</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#File-System-Implementation"><span class="toc-number">1.3.</span> <span class="toc-text">File-System Implementation</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#File-System-Layout"><span class="toc-number">1.3.1.</span> <span class="toc-text">File-System Layout</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Implementing-Files"><span class="toc-number">1.3.2.</span> <span class="toc-text">Implementing Files</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Contiguous-Allocation"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">Contiguous Allocation</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Linked-List-Allocation"><span class="toc-number">1.3.2.2.</span> <span class="toc-text">Linked-List Allocation</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Linked-List-Allocation-Using-a-Table-in-Memory"><span class="toc-number">1.3.2.3.</span> <span class="toc-text">Linked-List Allocation Using a Table in Memory</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#I-nodes"><span class="toc-number">1.3.2.4.</span> <span class="toc-text">I-nodes</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Implementing-Directories"><span class="toc-number">1.3.3.</span> <span class="toc-text">Implementing Directories</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Shared-Files"><span class="toc-number">1.3.4.</span> <span class="toc-text">Shared Files</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Log-Structured-File-System"><span class="toc-number">1.3.5.</span> <span class="toc-text">Log-Structured File System</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Journaling-File-System"><span class="toc-number">1.3.6.</span> <span class="toc-text">Journaling File System</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#LFS%E4%B8%8EJournaling-File-System%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-number">1.3.6.1.</span> <span class="toc-text">LFS与Journaling File System的区别</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Virtual-File-System"><span class="toc-number">1.3.7.</span> <span class="toc-text">Virtual File System</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#File-System-Management-and-Optimization"><span class="toc-number">1.4.</span> <span class="toc-text">File-System Management and Optimization</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Disk-Space-Management"><span class="toc-number">1.4.1.</span> <span class="toc-text">Disk-Space Management</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Block-Size"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">Block Size</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Keeping-Track-of-Free-Blocks"><span class="toc-number">1.4.1.2.</span> <span class="toc-text">Keeping Track of Free Blocks</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Using-Linked-List-of-Free-Blocks"><span class="toc-number">1.4.1.2.1.</span> <span class="toc-text">Using Linked List of Free Blocks</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Using-Bitmap"><span class="toc-number">1.4.1.2.2.</span> <span class="toc-text">Using Bitmap</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Disk-Quotas"><span class="toc-number">1.4.1.3.</span> <span class="toc-text">Disk Quotas</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Disk-Backup"><span class="toc-number">1.4.1.4.</span> <span class="toc-text">Disk Backup</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Incremental-Dump"><span class="toc-number">1.4.1.4.1.</span> <span class="toc-text">Incremental Dump</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Physical-Dump"><span class="toc-number">1.4.1.4.2.</span> <span class="toc-text">Physical Dump</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Logical-Dump"><span class="toc-number">1.4.1.4.3.</span> <span class="toc-text">Logical Dump</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#File-System-Consistency"><span class="toc-number">1.4.1.5.</span> <span class="toc-text">File-System Consistency</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#File-System-Performance"><span class="toc-number">1.4.1.6.</span> <span class="toc-text">File System Performance</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Caching"><span class="toc-number">1.4.1.6.1.</span> <span class="toc-text">Caching</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Block-Read-Ahead"><span class="toc-number">1.4.1.6.2.</span> <span class="toc-text">Block Read Ahead</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Reducing-Disk-Arm-Motion"><span class="toc-number">1.4.1.6.3.</span> <span class="toc-text">Reducing Disk-Arm Motion</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Defragmenting-Disks"><span class="toc-number">1.4.1.6.4.</span> <span class="toc-text">Defragmenting Disks</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Example-File-Systems"><span class="toc-number">1.5.</span> <span class="toc-text">Example File Systems</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CD-ROM-File-System"><span class="toc-number">1.5.1.</span> <span class="toc-text">CD-ROM File System</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ISO-9660"><span class="toc-number">1.5.1.1.</span> <span class="toc-text">ISO 9660</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MS-DOS-File-System"><span class="toc-number">1.5.2.</span> <span class="toc-text">MS-DOS File System</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Unix-V7-File-System"><span class="toc-number">1.5.3.</span> <span class="toc-text">Unix V7 File System</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Directory-Entry"><span class="toc-number">1.5.3.1.</span> <span class="toc-text">Directory Entry</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#I-node"><span class="toc-number">1.5.3.2.</span> <span class="toc-text">I-node</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Steps-in-Looking-Up-a-File"><span class="toc-number">1.5.3.3.</span> <span class="toc-text">Steps in Looking Up a File</span></a></li></ol></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2022/06/18/OS/File%20System%20-%20Chapter%204/" title="File System - Chapter 4"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="File System - Chapter 4"/></a><div class="content"><a class="title" href="/2022/06/18/OS/File%20System%20-%20Chapter%204/" title="File System - Chapter 4">File System - Chapter 4</a><time datetime="2022-06-18T07:22:00.000Z" title="Created 2022-06-18 15:22:00">2022-06-18</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/06/10/ComputerArchitecture/%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%20-%20Chapter%207/" title="存储系统 - Chapter 7"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="存储系统 - Chapter 7"/></a><div class="content"><a class="title" href="/2022/06/10/ComputerArchitecture/%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%20-%20Chapter%207/" title="存储系统 - Chapter 7">存储系统 - Chapter 7</a><time datetime="2022-06-10T15:02:00.000Z" title="Created 2022-06-10 23:02:00">2022-06-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/05/29/OS/Memory%20Management%20-%20Chapter%203/" title="Memory Management - Chapter 3"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Memory Management - Chapter 3"/></a><div class="content"><a class="title" href="/2022/05/29/OS/Memory%20Management%20-%20Chapter%203/" title="Memory Management - Chapter 3">Memory Management - Chapter 3</a><time datetime="2022-05-29T12:22:00.000Z" title="Created 2022-05-29 20:22:00">2022-05-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/05/13/OS/Deadlocks%20-%20Chapter%206/" title="Deadlocks - Chapter 6"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Deadlocks - Chapter 6"/></a><div class="content"><a class="title" href="/2022/05/13/OS/Deadlocks%20-%20Chapter%206/" title="Deadlocks - Chapter 6">Deadlocks - Chapter 6</a><time datetime="2022-05-13T12:22:00.000Z" title="Created 2022-05-13 20:22:00">2022-05-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/04/30/ComputerArchitecture/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F%E4%B8%8E%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80%20-%20Chapter%204/" title="指令系统与汇编语言"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="指令系统与汇编语言"/></a><div class="content"><a class="title" href="/2022/04/30/ComputerArchitecture/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F%E4%B8%8E%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80%20-%20Chapter%204/" title="指令系统与汇编语言">指令系统与汇编语言</a><time datetime="2022-04-30T15:02:00.000Z" title="Created 2022-04-30 23:02:00">2022-04-30</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')"><div id="footer-wrap"><div class="copyright">&copy;2021 - 2022 By Childish Chen</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.2
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, ''],
+        insertScript: [200, () => {
+          document.querySelectorAll('mjx-container:not\([display]\)').forEach(node => {
+            const target = node.parentNode
+            if (target.nodeName.toLowerCase() === 'li') {
+              target.parentNode.classList.add('has-jax')
+            } else {
+              target.classList.add('has-jax')
+            }
+          });
+        }, '', false]
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typeset()
+}</script><script>function loadLivere () {
+  if (typeof LivereTower === 'object') {
+    window.LivereTower.init()
+  }
+  else {
+    (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+    })(document, 'script');
+  }
+}
+
+if ('Livere' === 'Livere' || !false) {
+  if (false) btf.loadComment(document.getElementById('lv-container'), loadLivere)
+  else loadLivere()
+}
+else {
+  function loadOtherComment () {
+    loadLivere()
+  }
+}</script></div></div></body></html>
